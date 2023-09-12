@@ -14,11 +14,11 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float movementSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float dmg2UpperForce;
-    [SerializeField] private float bulletSpawnRate;
-    [SerializeField] private GameObject[] hearts;
     [SerializeField] private GameObject[] weapons;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float[] bulletPosition;
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private float fireRate;
 
     // Main character's dynamic status
     private bool _alive;
@@ -26,7 +26,6 @@ public class PlayerControls : MonoBehaviour
     private int _health;
     private float _directionX;
     private bool _isFiring;
-    private float _nextFire;
     private float _muzzleFlamePositiveXPosition;
     private Rigidbody2D _playerRigidbody2D;
     private Animator _playerAnimator;
@@ -50,7 +49,6 @@ public class PlayerControls : MonoBehaviour
         _health = 1;
         _directionX = 0f;
         _isFiring = false;
-        _nextFire = 0.0f;
         _canJump = true;
         _playerMovementState = MovementState.Idle;
 
@@ -86,124 +84,63 @@ public class PlayerControls : MonoBehaviour
             }
         
             // Fire
-            if (Input.GetButton("Fire1"))
+            // If the fire button is pressed and the player is not currently firing
+            if (Input.GetButtonDown("Fire1") && !_isFiring)
             {
-                Shooting(true);
+                _isFiring = true;
+                SetGunVisible();
+                StartCoroutine(FireBullets());
             }
-            else
+
+            // If the fire button is released
+            if (Input.GetButtonUp("Fire1"))
             {
-                Shooting(false);
+                _isFiring = false;
+                SetGunVisible();
             }
         }
-        
-        UpdatePlayerMovementState();
     }
 
-    /// <summary>
-    /// Control shooting the visibility of the gun
-    /// </summary>
-    /// <param name="fire"></param>
-    private void Shooting(bool fire)
+    private void SetGunVisible()
     {
-        // Let UpdatePlayerMovementState() know that we are shooting.
-        _isFiring = fire;
-
         // Make the gun visible
         for(int i = 0; i < _weaponSpriteRenderers.Length; i++)
         {
-            weapons[i].gameObject.SetActive(fire);
-        }
-
-        if (fire && Time.time > _nextFire)
-        {
-            _nextFire += bulletSpawnRate;
-            
-            // Bullet spawn position
-            if (_playerSpriteRenderer.flipX)
-            {
-                Instantiate(bulletPrefab, transform.position + new Vector3(bulletPosition[0], bulletPosition[1], 0), Quaternion.identity);
-            }
-            else
-            {
-                Instantiate(bulletPrefab, transform.position + new Vector3(-bulletPosition[0], bulletPosition[1], 0), Quaternion.identity);
-            }
+            weapons[i].gameObject.SetActive(_isFiring);
         }
     }
 
-    private void UpdatePlayerMovementState()
+    IEnumerator FireBullets()
     {
-        if (_alive)
+        // While the player is firing
+        while (_isFiring)
         {
-            // directionX != 0 is walking/running
-            if (_directionX != 0)
-            {
-                _playerMovementState = MovementState.Walking;
-            }
-            else
-            {
-                _playerMovementState = MovementState.Idle;
-            }
-
-            // player's y velocity indicates whether the character is jumping or falling
-            if (_playerRigidbody2D.velocity.y > 0.1f)
-            {
-                _playerMovementState = MovementState.Jumping;
-            }
-            else if(_playerRigidbody2D.velocity.y < -0.1f)
-            {
-                _playerMovementState = MovementState.Falling;
-            }
-        }
-        else
-        {
-            _playerMovementState = MovementState.Die;
-        }
-        
-        // if the character is shooting
-        if (_isFiring)
-        {
-            _playerMovementState = MovementState.Firing;
-            // Set muzzle flame position
-            if (_playerSpriteRenderer.flipX)
-            {
-                weapons[2].gameObject.SetActive(false);
-                weapons[3].gameObject.SetActive(true);
-            }
-            else if(!_playerSpriteRenderer.flipX)
-            {
-                weapons[2].gameObject.SetActive(true);
-                weapons[3].gameObject.SetActive(false);
-            }
-        }
-        else
-        {
-            weapons[2].gameObject.SetActive(false);
-            weapons[3].gameObject.SetActive(false);
-        }
-
-        // Update animation conditions
-        switch (_playerMovementState)
-        {
-            case MovementState.Idle:
-                _playerAnimator.SetInteger(MovementStateHashCode, 0);
-                break;
-            case MovementState.Walking:
-                _playerAnimator.SetInteger(MovementStateHashCode, 1);
-                break;
-            case MovementState.Jumping:
-                _playerAnimator.SetInteger(MovementStateHashCode, 2);
-                break;
-            case MovementState.Falling:
-                _playerAnimator.SetInteger(MovementStateHashCode, 3);
-                break;
-            case MovementState.Firing:
-                _playerAnimator.SetInteger(MovementStateHashCode, 4);
-                break;
-            case MovementState.Die:
-                _playerAnimator.SetInteger(MovementStateHashCode, 5);
-                break;
+            SpawnBullet();
+            yield return new WaitForSeconds(fireRate); // Wait for the fire rate duration before spawning the next bullet
         }
     }
+    
+    // Call this method to spawn a bullet
+    private void SpawnBullet()
+    {
+        // Instantiate the bullet at the spawn point
+        GameObject bullet = Instantiate(bulletPrefab, transform.position + new Vector3(-bulletPosition[0], bulletPosition[1], 0), Quaternion.identity);
+
+        // Get the Rigidbody2D component of the bullet
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        
+        // If the player is facing right, shoot the bullet to the right
+        if (_isFacingRight)
+        {
+            rb.velocity = new Vector2(bulletSpeed, 0);
+        }
+        // If the player is facing left, shoot the bullet to the left
+        else
+        {
+            rb.velocity = new Vector2(-bulletSpeed, 0);
+        }
+    }
+    
 
     /// <summary>
     /// Invoke when players press directional keys (a,d,left,right)
@@ -214,12 +151,14 @@ public class PlayerControls : MonoBehaviour
         if (_directionX != 0)
         {
             // Set player's sprites flip
-            _playerSpriteRenderer.flipX = _directionX > 0;
+            _isFacingRight = _directionX > 0;
+            
+            _playerSpriteRenderer.flipX = _isFacingRight;
 
             // Set weapon's sprites flip
             foreach (var gunPiece in _weaponSpriteRenderers)
             {
-                gunPiece.flipX = _directionX > 0;
+                gunPiece.flipX = _isFacingRight;
             }
         }
         
@@ -245,8 +184,6 @@ public class PlayerControls : MonoBehaviour
         _playerRigidbody2D.velocity = new Vector2(0, dmg2UpperForce);
         _health--;
 
-        SetHealthBar();
-        
         if (_health <= 0)
         {
             Die();
@@ -262,37 +199,9 @@ public class PlayerControls : MonoBehaviour
         
         _playerRigidbody2D.bodyType = RigidbodyType2D.Static;
 
-        UpdatePlayerMovementState();
+        // UpdatePlayerMovementState();
         
         _gameManager.GetComponent<GameManager>().GameOver();
-    }
-
-    /// <summary>
-    /// Update health bar.
-    /// </summary>
-    private void SetHealthBar()
-    {
-        switch (_health)
-        {
-            case 3:
-                foreach (var heart in hearts)
-                {
-                    heart.SetActive(true);
-                }
-                break;
-            case 2:
-                hearts[2].SetActive(false);
-                break;
-            case 1:
-                hearts[1].SetActive(false);
-                hearts[2].SetActive(false);
-                break;
-            case 0:
-                hearts[0].SetActive(false);
-                hearts[1].SetActive(false);
-                hearts[2].SetActive(false);
-                break;
-        }
     }
 
     /// <summary>
@@ -309,5 +218,10 @@ public class PlayerControls : MonoBehaviour
     public void TouchGround()
     {
         _canJump = true;
+    }
+
+    public bool isFacingRight()
+    {
+        return _isFacingRight;
     }
 }

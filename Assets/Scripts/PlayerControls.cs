@@ -14,27 +14,25 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float movementSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float dmg2UpperForce;
-    [SerializeField] private GameObject[] weapons;
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private float[] bulletPosition;
-    [SerializeField] private float bulletSpeed;
-    [SerializeField] private float fireRate;
+    [SerializeField] private float onFireRecoil;
+    [SerializeField] private GameObject weapons;
+
 
     // Main character's dynamic status
     private bool _alive;
     private bool _canJump;
     private int _health;
     private float _directionX;
-    private bool _isFiring;
+    private bool _playerIsFiring;
     private float _muzzleFlamePositiveXPosition;
     private Rigidbody2D _playerRigidbody2D;
     private Animator _playerAnimator;
     private SpriteRenderer _playerSpriteRenderer;
-    private SpriteRenderer[] _weaponSpriteRenderers = new SpriteRenderer[2];
     private MovementState _playerMovementState;
     private GameObject _gameManager;
     private bool _isFacingRight;
-    
+    private GunControls _gunScript;
+
     // Enums
     private enum MovementState
     {
@@ -48,7 +46,7 @@ public class PlayerControls : MonoBehaviour
         _alive = true;
         _health = 1;
         _directionX = 0f;
-        _isFiring = false;
+        _playerIsFiring = false;
         _canJump = true;
         _playerMovementState = MovementState.Idle;
 
@@ -57,11 +55,7 @@ public class PlayerControls : MonoBehaviour
         _playerSpriteRenderer = GetComponent<SpriteRenderer>();
         _gameManager = GameObject.Find("GameManager");
 
-        // Initialize weapon's sprite renderers
-        for (int i = 0; i < _weaponSpriteRenderers.Length; i++)
-        {
-            _weaponSpriteRenderers[i] = weapons[i].GetComponent<SpriteRenderer>();
-        }
+        _gunScript = weapons.GetComponent<GunControls>();
 
         // Debug MSG
         Debug.Log("Player initialization succeed!");
@@ -85,61 +79,22 @@ public class PlayerControls : MonoBehaviour
         
             // Fire
             // If the fire button is pressed and the player is not currently firing
-            if (Input.GetButtonDown("Fire1") && !_isFiring)
+            if (Input.GetButtonDown("Fire1") && !_playerIsFiring)
             {
-                _isFiring = true;
-                SetGunVisible();
-                StartCoroutine(FireBullets());
+                _playerIsFiring = true;
+                _gunScript.FireOn();
             }
 
             // If the fire button is released
             if (Input.GetButtonUp("Fire1"))
             {
-                _isFiring = false;
-                SetGunVisible();
+                _playerIsFiring = false;
+                _gunScript.FireOff();
             }
         }
     }
 
-    private void SetGunVisible()
-    {
-        // Make the gun visible
-        for(int i = 0; i < _weaponSpriteRenderers.Length; i++)
-        {
-            weapons[i].gameObject.SetActive(_isFiring);
-        }
-    }
-
-    IEnumerator FireBullets()
-    {
-        // While the player is firing
-        while (_isFiring)
-        {
-            SpawnBullet();
-            yield return new WaitForSeconds(fireRate); // Wait for the fire rate duration before spawning the next bullet
-        }
-    }
     
-    // Call this method to spawn a bullet
-    private void SpawnBullet()
-    {
-        // Instantiate the bullet at the spawn point
-        GameObject bullet = Instantiate(bulletPrefab, transform.position + new Vector3(-bulletPosition[0], bulletPosition[1], 0), Quaternion.identity);
-
-        // Get the Rigidbody2D component of the bullet
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        
-        // If the player is facing right, shoot the bullet to the right
-        if (_isFacingRight)
-        {
-            rb.velocity = new Vector2(bulletSpeed, 0);
-        }
-        // If the player is facing left, shoot the bullet to the left
-        else
-        {
-            rb.velocity = new Vector2(-bulletSpeed, 0);
-        }
-    }
     
 
     /// <summary>
@@ -154,12 +109,6 @@ public class PlayerControls : MonoBehaviour
             _isFacingRight = _directionX > 0;
             
             _playerSpriteRenderer.flipX = _isFacingRight;
-
-            // Set weapon's sprites flip
-            foreach (var gunPiece in _weaponSpriteRenderers)
-            {
-                gunPiece.flipX = _isFacingRight;
-            }
         }
         
         _playerRigidbody2D.velocity = new Vector2(_directionX * movementSpeed, _playerRigidbody2D.velocity.y);
@@ -223,5 +172,21 @@ public class PlayerControls : MonoBehaviour
     public bool isFacingRight()
     {
         return _isFacingRight;
+    }
+
+    public void FireRecoil()
+    {
+        Vector3 newPos = this.gameObject.transform.position;
+        
+        if (_isFacingRight)
+        {
+            newPos -= new Vector3(onFireRecoil, 0, 0);
+        }
+        else
+        {
+            newPos += new Vector3(onFireRecoil, 0, 0);
+        }
+
+        transform.position = newPos;
     }
 }

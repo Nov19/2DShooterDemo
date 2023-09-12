@@ -32,6 +32,7 @@ public class PlayerControls : MonoBehaviour
     private GameObject _gameManager;
     private bool _isFacingRight;
     private GunControls _gunScript;
+    private Rigidbody2D _rigidbody2D;
 
     // Enums
     private enum MovementState
@@ -91,11 +92,16 @@ public class PlayerControls : MonoBehaviour
                 _playerIsFiring = false;
                 _gunScript.FireOff();
             }
+
+            UpdatePlayerMovementStatus();
         }
     }
 
-    
-    
+    private void UpdatePlayerMovementStatus()
+    {
+        if()
+    }
+
 
     /// <summary>
     /// Invoke when players press directional keys (a,d,left,right)
@@ -148,6 +154,8 @@ public class PlayerControls : MonoBehaviour
         
         _playerRigidbody2D.bodyType = RigidbodyType2D.Static;
 
+        _gunScript.FireOff();
+        
         // UpdatePlayerMovementState();
         
         _gameManager.GetComponent<GameManager>().GameOver();

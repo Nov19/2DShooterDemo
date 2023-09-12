@@ -24,15 +24,22 @@ public class PlayerControls : MonoBehaviour
     private int _health;
     private float _directionX;
     private bool _playerIsFiring;
+    private bool _isFacingRight;
+    
+    // Helper values
+    private readonly float _yVelocityThreshold = 0.1f;
+    
+    // Player's components
     private float _muzzleFlamePositiveXPosition;
     private Rigidbody2D _playerRigidbody2D;
     private Animator _playerAnimator;
     private SpriteRenderer _playerSpriteRenderer;
     private MovementState _playerMovementState;
     private GameObject _gameManager;
-    private bool _isFacingRight;
     private GunControls _gunScript;
-    private Rigidbody2D _rigidbody2D;
+    
+    // status values
+    
 
     // Enums
     private enum MovementState
@@ -99,7 +106,38 @@ public class PlayerControls : MonoBehaviour
 
     private void UpdatePlayerMovementStatus()
     {
-        if()
+        // Firing suppresses all other states
+        if (!_alive)
+        {
+            _playerMovementState = MovementState.Die;
+        }
+        else if (_playerIsFiring)
+        {
+            _playerMovementState = MovementState.Firing;
+        }
+        else
+        {
+            // Check if character is on air
+            if (Math.Abs(_playerRigidbody2D.velocity.y) > _yVelocityThreshold)
+            {
+                Debug.Log("Jumping or Falling!");
+            }
+            else
+            {
+                // If the character is not on air, check whether it is moving
+                if (Math.Abs(_playerRigidbody2D.velocity.x) > _yVelocityThreshold)
+                {
+                    Debug.Log("Walking");
+                }
+                else
+                {
+                    Debug.Log("Idle");
+                }
+            }
+        }
+
+        // TODO:
+        // ChangeAnimatorState();
     }
 
 

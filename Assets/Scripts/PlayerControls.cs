@@ -79,7 +79,7 @@ public class PlayerControls : MonoBehaviour
         
             // Fire
             // If the fire button is pressed and the player is not currently firing
-            if (Input.GetButtonDown("Fire1") && !_playerIsFiring)
+            if (Input.GetButton("Fire1") && !_playerIsFiring)
             {
                 _playerIsFiring = true;
                 _gunScript.FireOn();

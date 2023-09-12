@@ -13,16 +13,27 @@ public class GunControls : MonoBehaviour
     [SerializeField] private float smoothingValue;
     [SerializeField] private Vector3 bulletOffset;
     [SerializeField] private float accurcyNoise;
+    [SerializeField] private AudioClip shootingSFX;
+    
+    private AudioSource audioSource;
 
     private bool _isFiring;
+    private bool _isFiringCoroutineRunning;
     private Vector3 _gun2ChatacterOffset;
     private System.Random random;
+    private double nextFireCoolDown;
 
     // Start is called before the first frame update
     void Start()
     {
+        _isFiring = false;
+        _isFiringCoroutineRunning = false;
+        
         _gun2ChatacterOffset = transform.position - playerCharacter.gameObject.transform.position;
+        nextFireCoolDown = 0;
+
         random = new System.Random();
+        audioSource = GetComponent<AudioSource>();
         
         Debug.Log("Gun initialized!");
     }
@@ -41,9 +52,15 @@ public class GunControls : MonoBehaviour
 
     public void FireOn()
     {
-        _isFiring = true;
-        SetGunVisible();
-        StartCoroutine(FireBullets());
+        // Set a fire cooldown
+        if (Time.time > nextFireCoolDown)
+        {
+            _isFiring = true;
+            SetGunVisible();
+
+            StartCoroutine(FireBullets());
+            nextFireCoolDown = Time.time + fireRate;
+        }
     }
 
     public void FireOff()
@@ -60,12 +77,18 @@ public class GunControls : MonoBehaviour
 
     IEnumerator FireBullets()
     {
+        // To fix "double click" issue
+        _isFiringCoroutineRunning = true;
+        
         // While the player is firing
         while (_isFiring)
         {
             SpawnBullet();
             yield return new WaitForSeconds(fireRate); // Wait for the fire rate duration before spawning the next bullet
         }
+
+        // To fix "double click" issue
+        _isFiringCoroutineRunning = false;
     }
     
     // Call this method to spawn a bullet
@@ -73,6 +96,9 @@ public class GunControls : MonoBehaviour
     {
         // OnFire recoil
         playerCharacter.GetComponent<PlayerControls>().FireRecoil();
+        
+        // Play shooting soundFX
+        audioSource.PlayOneShot(shootingSFX);
         
         // Instantiate the bullet at the spawn point
         var position = transform.position;

@@ -12,19 +12,16 @@ public class CameraControls : MonoBehaviour
     [SerializeField] private float lookAHeadDistance = 20.0f;
 
     private Vector3 camera2CharacterOffset;
-    private PlayerControls _playerScript;
     
     
     // Start is called before the first frame update
     void Start()
     {
         // Initialize camera position
-        Vector3 playerPosition = playerGameObject.transform.position;
-
-        transform.position = new Vector3(playerPosition.x, playerPosition.y + cameraHight, this.transform.position.z);
-        camera2CharacterOffset = transform.position - playerPosition;
-
-        _playerScript = playerGameObject.GetComponent<PlayerControls>();
+        Vector3 newPosition = playerGameObject.transform.position;
+        transform.position = new Vector3(newPosition.x, newPosition.y + cameraHight, this.transform.position.z);
+        
+        camera2CharacterOffset = transform.position - newPosition;
 
         Debug.Log("Camera controls initialized!");
     }
@@ -32,15 +29,15 @@ public class CameraControls : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
-        Vector3 playerCamPos;
-        if (_playerScript.isFacingRight()) // Assuming your player's script is named "PlayerScript"
+        Vector3 targetCamPos;
+        if (playerGameObject.GetComponent<PlayerControls>().isFacingRight()) // Assuming your player's script is named "PlayerScript"
         {
-            playerCamPos = playerGameObject.transform.position + camera2CharacterOffset + new Vector3(lookAHeadDistance, 0, 0);
+            targetCamPos = playerGameObject.transform.position + camera2CharacterOffset + new Vector3(lookAHeadDistance, 0, 0);
         }
         else
         {
-            playerCamPos = playerGameObject.transform.position + camera2CharacterOffset - new Vector3(lookAHeadDistance, 0, 0);
+            targetCamPos = playerGameObject.transform.position + camera2CharacterOffset - new Vector3(lookAHeadDistance, 0, 0);
         }
-        transform.position = Vector3.Lerp(transform.position, playerCamPos, smoothingValue * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, targetCamPos, smoothingValue * Time.deltaTime);
     }
 }

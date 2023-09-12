@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Dmg2Player
+  - Dmg2Monster
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - VFXs
+  - Characters
+  - Enemies
+  - Backgrounds
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Backgrounds
+    uniqueID: 117223291
+    locked: 0
+  - name: Enemies
+    uniqueID: 2066028283
+    locked: 0
+  - name: Characters
+    uniqueID: 1931590357
+    locked: 0
+  - name: VFXs
+    uniqueID: 789999151
+    locked: 0
+  - name: UIs
+    uniqueID: 3124066685
+    locked: 0

@@ -22,10 +22,11 @@ public class GunControls : MonoBehaviour
     private AudioSource audioSource;
 
     private bool _isFiring;
-    private bool _isFiringCoroutineRunning;
+    private bool _isDoubleShotEnable;
     private Vector3 _gun2ChatacterOffset;
-    private System.Random random;
-    private double nextFireCoolDown;
+    private System.Random _random;
+    private double _nextFireCoolDown;
+    private double _nextSpecial;
 
     public event OnFiringDelegate OnStopFire;
     public event OnFiringDelegate OnFire;
@@ -34,12 +35,13 @@ public class GunControls : MonoBehaviour
     void Start()
     {
         _isFiring = false;
-        _isFiringCoroutineRunning = false;
-        
-        _gun2ChatacterOffset = transform.position - playerCharacter.gameObject.transform.position;
-        nextFireCoolDown = 0;
+        _isDoubleShotEnable = false;
 
-        random = new System.Random();
+        _gun2ChatacterOffset = transform.position - playerCharacter.gameObject.transform.position;
+        _nextFireCoolDown = 0;
+        _nextSpecial = 0;
+
+        _random = new System.Random();
         audioSource = GetComponent<AudioSource>();
         
         // Make sure the gun is not visible when the game start
@@ -63,7 +65,7 @@ public class GunControls : MonoBehaviour
     public void FireOn()
     {
         // Set a fire cooldown
-        if (Time.time > nextFireCoolDown)
+        if (Time.time > _nextFireCoolDown)
         {
             _isFiring = true;
             SetGunVisible();
@@ -71,7 +73,7 @@ public class GunControls : MonoBehaviour
             SetMuzzle();
 
             StartCoroutine(FireBullets());
-            nextFireCoolDown = Time.time + fireRate;
+            _nextFireCoolDown = Time.time + fireRate;
         }
     }
 
@@ -103,9 +105,6 @@ public class GunControls : MonoBehaviour
 
     IEnumerator FireBullets()
     {
-        // To fix "double click" issue
-        _isFiringCoroutineRunning = true;
-        
         // While the player is firing
         while (_isFiring)
         {
@@ -115,7 +114,6 @@ public class GunControls : MonoBehaviour
 
         // To fix "double click" issue
         OnStopFire?.Invoke();
-        _isFiringCoroutineRunning = false;
     }
     
     // Call this method to spawn a bullet
@@ -147,12 +145,29 @@ public class GunControls : MonoBehaviour
         // If the player is facing right, shoot the bullet to the right
         if (weaponSpriteRenderers.flipX)
         {
-            rb.velocity = new Vector2(bulletSpeed, ((float)random.NextDouble()-0.3f)*accurcyNoise);
+            rb.velocity = new Vector2(bulletSpeed, ((float)_random.NextDouble()-0.3f)*accurcyNoise);
         }
         // If the player is facing left, shoot the bullet to the left
         else
         {
-            rb.velocity = new Vector2(-bulletSpeed, ((float)random.NextDouble()-0.3f)*accurcyNoise);
+            rb.velocity = new Vector2(-bulletSpeed, ((float)_random.NextDouble()-0.3f)*accurcyNoise);
         }
+    }
+
+    public void EnableDoubleShot()
+    {
+        if (!_isDoubleShotEnable && Time.time > _nextSpecial)
+        {
+            _nextSpecial = Time.time + 6f;
+            
+            _isDoubleShotEnable = true;
+            StartCoroutine(DisableDoubleShot());
+        }
+    }
+
+    IEnumerator DisableDoubleShot()
+    {
+        yield return new WaitForSeconds(3f);
+        _isDoubleShotEnable = false;
     }
 }

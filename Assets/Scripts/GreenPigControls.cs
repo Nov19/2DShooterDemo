@@ -118,7 +118,6 @@ public class GreenPigControls : MonoBehaviour
 
     private void TakeDmg()
     {
-        Debug.Log("Hit!");
         _isHit = true;
         
         Hit2WalkMovementStatus();

@@ -16,6 +16,7 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float dmg2UpperForce;
     [SerializeField] private float onFireRecoil;
     [SerializeField] private GameObject weapons;
+    [SerializeField] private GameObject stepTrigger;
 
 
     // Main character's dynamic status
@@ -37,6 +38,8 @@ public class PlayerControls : MonoBehaviour
     private MovementState _playerMovementState;
     private GameObject _gameManager;
     private GunControls _gunScript;
+    private StepTrigger _stepTriggerScript;
+    private bool _shouldNotHurt;
 
     // Enums
     private enum MovementState
@@ -69,7 +72,11 @@ public class PlayerControls : MonoBehaviour
         _gameManager = GameObject.Find("GameManager");
 
         _gunScript = weapons.GetComponent<GunControls>();
-        _gunScript.OnStopFire += FireISOff;
+        _gunScript.OnStopFire += FireIsOff;
+
+        _stepTriggerScript = stepTrigger.GetComponent<StepTrigger>();
+        _stepTriggerScript.OnStepEnter += ShouldNotTakeDMG;
+        _stepTriggerScript.OnStepExit += ShouldTakeDMG;
         // Debug MSG
         // Debug.Log("Player initialization succeed!");
     }
@@ -107,6 +114,11 @@ public class PlayerControls : MonoBehaviour
             {
                 _playerIsFiring = false;
                 _gunScript.FireOff();
+            }
+
+            if (Input.GetButtonDown("Special1"))
+            {
+                _gunScript.EnableDoubleShot();
             }
         }
         else
@@ -230,6 +242,10 @@ public class PlayerControls : MonoBehaviour
 
     private void TakeDmg()
     {
+        // When stepped on enemies...
+        if (_shouldNotHurt)
+            return;
+        
         _playerRigidbody2D.velocity = new Vector2(0, dmg2UpperForce);
         _health--;
 
@@ -262,7 +278,8 @@ public class PlayerControls : MonoBehaviour
     /// </summary>
     public void StepOnMonster()
     {
-        _playerRigidbody2D.velocity = new Vector2(_playerRigidbody2D.velocity.x, jumpForce / 2);
+        Vector2 curVelocity = _playerRigidbody2D.velocity;
+        _playerRigidbody2D.velocity = new Vector2(curVelocity.x, jumpForce / 1.5f);
     }
 
     /// <summary>
@@ -273,7 +290,7 @@ public class PlayerControls : MonoBehaviour
         _canJump = true;
     }
 
-    public bool isFacingRight()
+    public bool IsFacingRight()
     {
         return _isFacingRight;
     }
@@ -294,8 +311,18 @@ public class PlayerControls : MonoBehaviour
         transform.position = newPos;
     }
 
-    public void FireISOff()
+    private void FireIsOff()
     {
         _playerIsFiring = false;
+    }
+
+    private void ShouldNotTakeDMG()
+    {
+        _shouldNotHurt = true;
+    }
+    
+    private void ShouldTakeDMG()
+    {
+        _shouldNotHurt = false;
     }
 }

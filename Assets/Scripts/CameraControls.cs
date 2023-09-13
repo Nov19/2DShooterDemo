@@ -30,7 +30,7 @@ public class CameraControls : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 targetCamPos;
-        if (playerGameObject.GetComponent<PlayerControls>().isFacingRight()) // Assuming your player's script is named "PlayerScript"
+        if (playerGameObject.GetComponent<PlayerControls>().IsFacingRight()) // Assuming your player's script is named "PlayerScript"
         {
             targetCamPos = playerGameObject.transform.position + camera2CharacterOffset + new Vector3(lookAHeadDistance, 0, 0);
         }

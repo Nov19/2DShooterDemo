@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4139208277872109233}
   - component: {fileID: 4139208277872109232}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dmg2PlayerCollider
   m_TagString: Dmg2Player
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 4139208278607694725}
   - component: {fileID: 4139208278607694721}
   - component: {fileID: 4139208278607694720}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GreenPig
   m_TagString: Dmg2Player
   m_Icon: {fileID: 0}

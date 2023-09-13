@@ -38,9 +38,6 @@ public class PlayerControls : MonoBehaviour
     private GameObject _gameManager;
     private GunControls _gunScript;
 
-    // status values
-
-
     // Enums
     private enum MovementState
     {
@@ -69,9 +66,9 @@ public class PlayerControls : MonoBehaviour
         _gameManager = GameObject.Find("GameManager");
 
         _gunScript = weapons.GetComponent<GunControls>();
-
+        _gunScript.OnStopFire += FireISOff;
         // Debug MSG
-        Debug.Log("Player initialization succeed!");
+        // Debug.Log("Player initialization succeed!");
     }
 
     // Update is called once per frame
@@ -92,10 +89,14 @@ public class PlayerControls : MonoBehaviour
 
             // Fire
             // If the fire button is pressed and the player is not currently firing
-            if (Input.GetButton("Fire1") && !_playerIsFiring)
+            if (Input.GetButton("Fire1"))
             {
-                _playerIsFiring = true;
-                _gunScript.FireOn();
+                // Debug.Log("Fire!");
+                if (!_playerIsFiring)
+                {
+                    _playerIsFiring = true;
+                    _gunScript.FireOn();
+                }
             }
 
             // If the fire button is released
@@ -126,7 +127,6 @@ public class PlayerControls : MonoBehaviour
             float velocityY = _playerRigidbody2D.velocity.y;
             if (Math.Abs(velocityY) > _yVelocityThreshold)
             {
-                Debug.Log("Jumping or Falling!");
                 if (velocityY > 0)
                 {
                     _playerMovementState = MovementState.Jumping;
@@ -141,18 +141,15 @@ public class PlayerControls : MonoBehaviour
                 // If the character is not on air, check whether it is moving
                 if (Math.Abs(_playerRigidbody2D.velocity.x) > _yVelocityThreshold)
                 {
-                    Debug.Log("Walking");
                     _playerMovementState = MovementState.Walking;
                 }
                 else
                 {
-                    Debug.Log("Idle");
                     _playerMovementState = MovementState.Idle;
                 }
             }
         }
-
-        // TODO:
+        
         ChangeAnimatorState();
     }
 
@@ -160,7 +157,26 @@ public class PlayerControls : MonoBehaviour
     {
         switch (_playerMovementState)
         {
-            
+            case MovementState.Idle:
+                _playerAnimator.SetInteger(MovementStateHashCode, 0);
+                break;
+            case MovementState.Walking:
+                _playerAnimator.SetInteger(MovementStateHashCode, 1);
+                break;
+            case MovementState.Jumping:
+                _playerAnimator.SetInteger(MovementStateHashCode, 2);
+                break;
+            case MovementState.Falling:
+                _playerAnimator.SetInteger(MovementStateHashCode, 3);
+                break;
+            case MovementState.Firing:
+                _playerAnimator.SetInteger(MovementStateHashCode, 4);
+                break;
+            case MovementState.Die:
+                _playerAnimator.SetInteger(MovementStateHashCode, 5);
+                break;
+            default:
+                throw new NotImplementedException();
         }
     }
 
@@ -258,5 +274,10 @@ public class PlayerControls : MonoBehaviour
         }
 
         transform.position = newPos;
+    }
+
+    public void FireISOff()
+    {
+        _playerIsFiring = false;
     }
 }

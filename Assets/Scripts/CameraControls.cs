@@ -23,7 +23,7 @@ public class CameraControls : MonoBehaviour
         
         camera2CharacterOffset = transform.position - newPosition;
 
-        Debug.Log("Camera controls initialized!");
+        // Debug.Log("Camera controls initialized!");
     }
 
     // Update is called once per frame

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public delegate void StopFiringDelegate();
+
 public class GunControls : MonoBehaviour
 {
     [SerializeField] private GameObject playerCharacter;
@@ -23,6 +25,8 @@ public class GunControls : MonoBehaviour
     private System.Random random;
     private double nextFireCoolDown;
 
+    public event StopFiringDelegate OnStopFire;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -35,7 +39,12 @@ public class GunControls : MonoBehaviour
         random = new System.Random();
         audioSource = GetComponent<AudioSource>();
         
-        Debug.Log("Gun initialized!");
+        // Make sure the gun is not visible when the game start
+        SetGunVisible();
+        
+         
+
+        // Debug.Log("Gun initialized!");
     }
 
     // Update is called once per frame
@@ -88,6 +97,7 @@ public class GunControls : MonoBehaviour
         }
 
         // To fix "double click" issue
+        OnStopFire?.Invoke();
         _isFiringCoroutineRunning = false;
     }
     
@@ -127,5 +137,10 @@ public class GunControls : MonoBehaviour
         {
             rb.velocity = new Vector2(-bulletSpeed, ((float)random.NextDouble()-0.3f)*accurcyNoise);
         }
+    }
+
+    public bool isFiring()
+    {
+        return _isFiring;
     }
 }

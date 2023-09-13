@@ -77,8 +77,8 @@ public class PlayerControls : MonoBehaviour
         // Enable player's controls when the character is alive
         if (_alive)
         {
-            // Move towards left/right
             _directionX = Input.GetAxis("Horizontal");
+            // Move towards left/right
             MoveLeftOrRight();
 
             // Jump
@@ -186,8 +186,8 @@ public class PlayerControls : MonoBehaviour
     /// </summary>
     private void MoveLeftOrRight()
     {
-        // Flip the character and the weapon based on moving direction
-        if (_directionX != 0)
+        // Flip the character and the weapon based on moving direction only when player is not firing
+        if (_directionX != 0 && !_playerIsFiring)
         {
             // Set player's sprites flip
             _isFacingRight = _directionX > 0;
@@ -195,7 +195,16 @@ public class PlayerControls : MonoBehaviour
             _playerSpriteRenderer.flipX = _isFacingRight;
         }
 
-        _playerRigidbody2D.velocity = new Vector2(_directionX * movementSpeed, _playerRigidbody2D.velocity.y);
+        Vector2 newVelocity;
+        if (_playerIsFiring)
+        {
+            newVelocity = new Vector2(_directionX * movementSpeed * 0.8f, _playerRigidbody2D.velocity.y);
+        }
+        else
+        {
+            newVelocity = new Vector2(_directionX * movementSpeed, _playerRigidbody2D.velocity.y);
+        }
+        _playerRigidbody2D.velocity = newVelocity;
     }
 
     private void Jump()

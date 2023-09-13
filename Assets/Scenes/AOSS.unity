@@ -52797,7 +52797,7 @@ MonoBehaviour:
   fireRate: 0.15
   smoothingValue: 100
   bulletOffset: {x: 0.9, y: 0.55, z: 0}
-  accurcyNoise: 1
+  accurcyNoise: 1.5
   shootingSFX: {fileID: 8300000, guid: 2277c8a15672949e0ac4e6b156527140, type: 3}
 --- !u!82 &2119071322
 AudioSource:

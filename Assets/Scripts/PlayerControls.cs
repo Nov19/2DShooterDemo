@@ -8,7 +8,7 @@ public class PlayerControls : MonoBehaviour
 {
     // Main character's constant status
     private static readonly int MovementStateHashCode = Animator.StringToHash("MovementState");
-    
+
     // Serialized fields
     [SerializeField] private GameObject gameManager;
     [SerializeField] private float movementSpeed;
@@ -25,10 +25,10 @@ public class PlayerControls : MonoBehaviour
     private float _directionX;
     private bool _playerIsFiring;
     private bool _isFacingRight;
-    
+
     // Helper values
     private readonly float _yVelocityThreshold = 0.1f;
-    
+
     // Player's components
     private float _muzzleFlamePositiveXPosition;
     private Rigidbody2D _playerRigidbody2D;
@@ -37,14 +37,19 @@ public class PlayerControls : MonoBehaviour
     private MovementState _playerMovementState;
     private GameObject _gameManager;
     private GunControls _gunScript;
-    
+
     // status values
-    
+
 
     // Enums
     private enum MovementState
     {
-        Idle, Walking, Jumping, Falling, Firing, Die
+        Idle,
+        Walking,
+        Jumping,
+        Falling,
+        Firing,
+        Die
     }
 
 
@@ -84,7 +89,7 @@ public class PlayerControls : MonoBehaviour
             {
                 Jump();
             }
-        
+
             // Fire
             // If the fire button is pressed and the player is not currently firing
             if (Input.GetButton("Fire1") && !_playerIsFiring)
@@ -118,9 +123,18 @@ public class PlayerControls : MonoBehaviour
         else
         {
             // Check if character is on air
-            if (Math.Abs(_playerRigidbody2D.velocity.y) > _yVelocityThreshold)
+            float velocityY = _playerRigidbody2D.velocity.y;
+            if (Math.Abs(velocityY) > _yVelocityThreshold)
             {
                 Debug.Log("Jumping or Falling!");
+                if (velocityY > 0)
+                {
+                    _playerMovementState = MovementState.Jumping;
+                }
+                else
+                {
+                    _playerMovementState = MovementState.Falling;
+                }
             }
             else
             {
@@ -128,16 +142,26 @@ public class PlayerControls : MonoBehaviour
                 if (Math.Abs(_playerRigidbody2D.velocity.x) > _yVelocityThreshold)
                 {
                     Debug.Log("Walking");
+                    _playerMovementState = MovementState.Walking;
                 }
                 else
                 {
                     Debug.Log("Idle");
+                    _playerMovementState = MovementState.Idle;
                 }
             }
         }
 
         // TODO:
-        // ChangeAnimatorState();
+        ChangeAnimatorState();
+    }
+
+    private void ChangeAnimatorState()
+    {
+        switch (_playerMovementState)
+        {
+            
+        }
     }
 
 
@@ -151,10 +175,10 @@ public class PlayerControls : MonoBehaviour
         {
             // Set player's sprites flip
             _isFacingRight = _directionX > 0;
-            
+
             _playerSpriteRenderer.flipX = _isFacingRight;
         }
-        
+
         _playerRigidbody2D.velocity = new Vector2(_directionX * movementSpeed, _playerRigidbody2D.velocity.y);
     }
 
@@ -189,13 +213,13 @@ public class PlayerControls : MonoBehaviour
     public void Die()
     {
         _alive = false;
-        
+
         _playerRigidbody2D.bodyType = RigidbodyType2D.Static;
 
         _gunScript.FireOff();
-        
+
         // UpdatePlayerMovementState();
-        
+
         _gameManager.GetComponent<GameManager>().GameOver();
     }
 
@@ -204,9 +228,9 @@ public class PlayerControls : MonoBehaviour
     /// </summary>
     public void StepOnMonster()
     {
-        _playerRigidbody2D.velocity = new Vector2(_playerRigidbody2D.velocity.x, jumpForce/2);
+        _playerRigidbody2D.velocity = new Vector2(_playerRigidbody2D.velocity.x, jumpForce / 2);
     }
-    
+
     /// <summary>
     /// enable jumping when players touch any grounds.
     /// </summary>
@@ -223,7 +247,7 @@ public class PlayerControls : MonoBehaviour
     public void FireRecoil()
     {
         Vector3 newPos = this.gameObject.transform.position;
-        
+
         if (_isFacingRight)
         {
             newPos -= new Vector3(onFireRecoil, 0, 0);

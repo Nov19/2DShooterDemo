@@ -227,9 +227,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 5
-  walkSpeed: 2
-  patrolSpeed: 1.5
-  patrolPeriod: 3
   runSpeed: 3.5
-  target: {fileID: 0}
-  irritateDistance: 8
+  frozenTime: 0.04

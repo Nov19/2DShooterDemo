@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class MonsterSpawner : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class MonsterSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _spawnTimer = 0f;
+        _spawnTimer = spawnCoolDown;
     }
 
     // Update is called once per frame
@@ -22,7 +23,7 @@ public class MonsterSpawner : MonoBehaviour
     {
         if (Time.time > _spawnTimer)
         {
-            _spawnTimer += spawnCoolDown;
+            _spawnTimer += UnityEngine.Random.Range(spawnCoolDown, spawnCoolDown*2);
 
             // Mimic the power charge to spawn the monster
             spawnSign.gameObject.SetActive(true);

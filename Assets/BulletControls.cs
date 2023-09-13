@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class BulletControls : MonoBehaviour
 {
+    [SerializeField] private GameObject explosionPrefab;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +21,12 @@ public class BulletControls : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // TODO: Hit VFX - hit a wall / enemies
+        var explosionVFX = Instantiate(explosionPrefab, transform.position, transform.rotation);
+        
+        Destroy(explosionVFX, 0.12f);
+
+        // Destroy the bullet after spawning the VFX
         Destroy(gameObject);
     }
 }

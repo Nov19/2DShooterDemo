@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Dmg2Player
   - Dmg2Monster
+  - Terrain
   layers:
   - Default
   - TransparentFX

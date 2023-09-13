@@ -49039,7 +49039,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 828488508}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 27.51, y: -2.89, z: 0}
+  m_LocalPosition: {x: 5.8, y: -2.89, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -49163,7 +49163,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 959403539}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 17.8, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -52770,7 +52770,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2119071319}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 27.51, y: -2.89, z: 0}
+  m_LocalPosition: {x: 5.800001, y: -2.89, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -52793,8 +52793,8 @@ MonoBehaviour:
   playerCharacter: {fileID: 828488508}
   weaponSpriteRenderers: {fileID: 1528693780}
   bulletPrefab: {fileID: 8358752058971927341, guid: 5056fedf76bf74cc58525900392f72d5, type: 3}
-  bulletSpeed: 10
-  fireRate: 0.15
+  bulletSpeed: 15
+  fireRate: 0.1
   smoothingValue: 100
   bulletOffset: {x: 0.9, y: 0.55, z: 0}
   accurcyNoise: 1.5

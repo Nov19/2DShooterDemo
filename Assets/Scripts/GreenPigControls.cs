@@ -32,6 +32,7 @@ public class GreenPigControls : MonoBehaviour
     private SpriteRenderer _greenpigSpriteRenderer;
     private MonsterMovementState _monsterMovementState;
     private static readonly int MovementState = Animator.StringToHash("MovementState");
+    private GameManager _gameManager;
 
 
     // Start is called before the first frame update
@@ -46,6 +47,7 @@ public class GreenPigControls : MonoBehaviour
         _monsterMovementState = MonsterMovementState.Walking;
         _greenpigRigidbody2D = GetComponent<Rigidbody2D>();
         _greenpigSpriteRenderer = GetComponent<SpriteRenderer>();
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -63,63 +65,12 @@ public class GreenPigControls : MonoBehaviour
     /// </summary>
     private void MovementAI()
     {
-        if (target is null)
-            return;
-
-        // Calculate the direction towards the target
-        float directionX2Go = target.position.x - transform.position.x;
-        // Change sprite flipX
-        _greenpigSpriteRenderer.flipX = directionX2Go > 0;
-
-        float speed;
-        if (_hit && _runningCounter <= 3000)
-        {
-            speed = runSpeed;
-            _runningCounter++;
-            _monsterMovementState = MonsterMovementState.Running;
-        }
-        else
-        {
-            _hit = false;
-            _runningCounter = 0;
-            speed = walkSpeed;
-            _monsterMovementState = MonsterMovementState.Walking;
-        }
-
-        // Move the AI towards the player when they're close enough and not too close
-        if (directionX2Go is < -0.2f or > 0.2f)
-        {
-            if (directionX2Go < irritateDistance)
-            {
-                _greenpigRigidbody2D.velocity = directionX2Go > 0 ? new Vector2(speed, _greenpigRigidbody2D.velocity.y) : new Vector2(-speed, _greenpigRigidbody2D.velocity.y);
-            }
-        }
         
-        if (directionX2Go > irritateDistance)
-        //if (directionX2Go > irritateDistance && Time.time > _patrolTimer)
-        {
-            // This makes the monster moving toward a random direction.
-            if (Time.time > _patrolTimer)
-            {
-                _patrolTimer += patrolPeriod;
-                _patrolDirection = Random.Range(0, 2) == 0 ? -1 : 1;
-            }
-            
-            _greenpigRigidbody2D.velocity = new Vector2(_patrolDirection * patrolSpeed, _greenpigRigidbody2D.velocity.y);
-        }
     }
 
     private void UpdateMovementState()
     {
-        switch (_monsterMovementState)
-        {
-            case MonsterMovementState.Walking:
-                _greenpigAnimator.SetInteger(MovementState, 0);
-                break;
-            case MonsterMovementState.Running:
-                _greenpigAnimator.SetInteger(MovementState, 1);
-                break;
-        }
+        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -135,9 +86,13 @@ public class GreenPigControls : MonoBehaviour
     private void TakeDmg()
     {
         _hit = true;
+        Debug.Log("Hit!");
 
         if (health - 1 < 1)
-            Destroy(this.gameObject);
+        {
+            _gameManager.OnKillPause();
+            Destroy(gameObject);
+        }
 
         health--;
         _greenpigRigidbody2D.velocity = new Vector2(runSpeed / 4, 0);

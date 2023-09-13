@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void StopFiringDelegate();
+public delegate void OnFiringDelegate();
 
 public class GunControls : MonoBehaviour
 {
@@ -16,6 +16,8 @@ public class GunControls : MonoBehaviour
     [SerializeField] private Vector3 bulletOffset;
     [SerializeField] private float accurcyNoise;
     [SerializeField] private AudioClip shootingSFX;
+    [SerializeField] private GameObject muzzle_left;
+    [SerializeField] private GameObject muzzle_right;
     
     private AudioSource audioSource;
 
@@ -25,8 +27,9 @@ public class GunControls : MonoBehaviour
     private System.Random random;
     private double nextFireCoolDown;
 
-    public event StopFiringDelegate OnStopFire;
-    
+    public event OnFiringDelegate OnStopFire;
+    public event OnFiringDelegate OnFire;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,8 +44,6 @@ public class GunControls : MonoBehaviour
         
         // Make sure the gun is not visible when the game start
         SetGunVisible();
-        
-         
 
         // Debug.Log("Gun initialized!");
     }
@@ -67,6 +68,8 @@ public class GunControls : MonoBehaviour
             _isFiring = true;
             SetGunVisible();
 
+            SetMuzzle();
+
             StartCoroutine(FireBullets());
             nextFireCoolDown = Time.time + fireRate;
         }
@@ -76,8 +79,22 @@ public class GunControls : MonoBehaviour
     {
         _isFiring = false;
         SetGunVisible();
+        
+        SetMuzzle();
     }
-    
+
+    private void SetMuzzle()
+    {
+        if (weaponSpriteRenderers.flipX)
+        {
+            muzzle_right.SetActive(_isFiring);
+        }
+        else
+        {
+            muzzle_left.SetActive(_isFiring);
+        }
+    }
+
     private void SetGunVisible()
     {
         // Make the gun visible
@@ -137,10 +154,5 @@ public class GunControls : MonoBehaviour
         {
             rb.velocity = new Vector2(-bulletSpeed, ((float)random.NextDouble()-0.3f)*accurcyNoise);
         }
-    }
-
-    public bool isFiring()
-    {
-        return _isFiring;
     }
 }

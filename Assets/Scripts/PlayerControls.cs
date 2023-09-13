@@ -53,6 +53,9 @@ public class PlayerControls : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Reset time scale
+        Time.timeScale = 1f;
+        
         _alive = true;
         _health = 1;
         _directionX = 0f;
@@ -105,9 +108,13 @@ public class PlayerControls : MonoBehaviour
                 _playerIsFiring = false;
                 _gunScript.FireOff();
             }
-
-            UpdatePlayerMovementStatus();
         }
+        else
+        {
+            Time.timeScale = 0.2f;
+        }
+        
+        UpdatePlayerMovementStatus();
     }
 
     private void UpdatePlayerMovementStatus()
@@ -246,6 +253,8 @@ public class PlayerControls : MonoBehaviour
         // UpdatePlayerMovementState();
 
         _gameManager.GetComponent<GameManager>().GameOver();
+        
+        Destroy(gameObject, 0.5f);
     }
 
     /// <summary>

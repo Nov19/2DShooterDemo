@@ -18,7 +18,7 @@ public class GreenPigControls : MonoBehaviour
     [SerializeField] private float impairedSpeed;
     // Reference to the player GameObject or target object
     [SerializeField] private float frozenTime;
-    
+    [SerializeField] private GameObject dmgCollider;
     
     private float _runningCounter;
     private Animator _greenPigAnimator;
@@ -114,7 +114,7 @@ public class GreenPigControls : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Dmg2Monster"))
+        if (other.CompareTag("Dmg2Monster") && _isAlive)
         {
             TakeDmg();
         }
@@ -149,8 +149,10 @@ public class GreenPigControls : MonoBehaviour
             _isAlive = false;
             _movementSpeed = 0;
 
-            _greenPigBoxCollider2D.isTrigger = true;
-            _greenPigRigidbody2D.simulated = false;
+            gameObject.tag = "Remains";
+            dmgCollider.tag = "Remains";
+
+            gameObject.layer = 10;
 
             _greenPigSpriteRenderer.sortingLayerName = "Remains";
             _greenPigSpriteRenderer.sortingOrder = 0;

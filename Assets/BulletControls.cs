@@ -21,12 +21,15 @@ public class BulletControls : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // TODO: Hit VFX - hit a wall / enemies
-        var explosionVFX = Instantiate(explosionPrefab, transform.position, transform.rotation);
+        if (other.CompareTag("Terrain") || other.CompareTag("Dmg2Player"))
+        {
+            // TODO: Hit VFX - hit a wall / enemies
+            var explosionVFX = Instantiate(explosionPrefab, transform.position, transform.rotation);
         
-        Destroy(explosionVFX, 0.12f);
+            Destroy(explosionVFX, 0.12f);
 
-        // Destroy the bullet after spawning the VFX
-        Destroy(gameObject);
+            // Destroy the bullet after spawning the VFX
+            Destroy(gameObject);
+        }
     }
 }

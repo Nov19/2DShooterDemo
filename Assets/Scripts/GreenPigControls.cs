@@ -149,13 +149,10 @@ public class GreenPigControls : MonoBehaviour
             _isAlive = false;
             _movementSpeed = 0;
 
-            _greenPigBoxCollider2D.enabled = false;
+            _greenPigBoxCollider2D.isTrigger = true;
             _greenPigRigidbody2D.simulated = false;
 
-            var curPos = transform.position;
-            transform.position = new Vector3(curPos.x,curPos.y - 0.1f,0);
-
-            _greenPigSpriteRenderer.sortingLayerName = "Backgrounds";
+            _greenPigSpriteRenderer.sortingLayerName = "Remains";
             _greenPigSpriteRenderer.sortingOrder = 0;
         }
 

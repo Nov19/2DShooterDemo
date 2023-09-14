@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour
     private void ResetGame()
     {
         SceneManager.LoadScene("AOSS");
+        Time.timeScale = 1.0f;
     }
     
     public void OnKillPause()

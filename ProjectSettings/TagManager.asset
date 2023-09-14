@@ -45,11 +45,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Remains
-    uniqueID: 3514326183
-    locked: 0
   - name: Backgrounds
     uniqueID: 117223291
+    locked: 0
+  - name: Remains
+    uniqueID: 3514326183
     locked: 0
   - name: Enemies
     uniqueID: 2066028283

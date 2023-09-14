@@ -11,14 +11,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text restartText;
 
     private bool _playerAlive;
-    private bool _isPaused;
 
     // Start is called before the first frame update
     void Start()
     {
         _playerAlive = true;
-        _isPaused = false;
-        
+
         gameOverText.gameObject.SetActive(false);
         restartText.gameObject.SetActive(false);
     }
@@ -76,13 +74,18 @@ public class GameManager : MonoBehaviour
     
     public void OnKillPause()
     {
-        StartCoroutine(SlowMotionEffect());
+        StartCoroutine(SlowMotionEffect(0.1f, 0.07f));
+    }
+
+    public void GameOverSloMo()
+    {
+        StartCoroutine(SlowMotionEffect(0.2f, 3f));
     }
     
-    IEnumerator SlowMotionEffect()
+    IEnumerator SlowMotionEffect(float slowFactor, float slowMoPeriod)
     {
-        Time.timeScale = 0.1f;
-        yield return new WaitForSecondsRealtime(0.07f);
+        Time.timeScale = slowFactor;
+        yield return new WaitForSecondsRealtime(slowMoPeriod);
         Time.timeScale = 1f;
     }
 }

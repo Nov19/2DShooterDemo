@@ -227,5 +227,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 5
-  runSpeed: 3.5
+  runSpeed: 4.5
+  impairedSpeed: 0
   frozenTime: 0.04

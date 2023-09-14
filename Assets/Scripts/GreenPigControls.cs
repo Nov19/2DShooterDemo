@@ -9,11 +9,13 @@ public class GreenPigControls : MonoBehaviour
     enum MonsterMovementState
     {
         Walking,
-        Hit
+        Hit,
+        Die
     }
 
     [SerializeField] private int health;
     [SerializeField] private float runSpeed;
+    [SerializeField] private float impairedSpeed;
     // Reference to the player GameObject or target object
     [SerializeField] private float frozenTime;
     
@@ -21,6 +23,7 @@ public class GreenPigControls : MonoBehaviour
     private float _runningCounter;
     private Animator _greenPigAnimator;
     private Rigidbody2D _greenPigRigidbody2D;
+    private BoxCollider2D _greenPigBoxCollider2D;
     private MonsterMovementState _monsterMovementState;
     private static readonly int MovementState = Animator.StringToHash("MovementState");
     private GameManager _gameManager;
@@ -29,6 +32,8 @@ public class GreenPigControls : MonoBehaviour
     private SpriteRenderer _greenPigSpriteRenderer;
     
     private int _directionX;
+    private float _movementSpeed;
+    private bool _isAlive;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +41,7 @@ public class GreenPigControls : MonoBehaviour
         _greenPigAnimator = GetComponent<Animator>();
         _monsterMovementState = MonsterMovementState.Walking;
         _greenPigRigidbody2D = GetComponent<Rigidbody2D>();
+        _greenPigBoxCollider2D = GetComponent<BoxCollider2D>();
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _greenPigSpriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -43,13 +49,16 @@ public class GreenPigControls : MonoBehaviour
 
         _directionX = 1;
         _greenPigSpriteRenderer.flipX = _directionX > 0;
+        _isAlive = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Chase player
-        MovementAI();
+        if (_isAlive)
+        {
+            MovementAI();
+        }
 
         UpdateMovementStatus();
     }
@@ -59,18 +68,27 @@ public class GreenPigControls : MonoBehaviour
     /// </summary>
     private void MovementAI()
     {
-        _greenPigRigidbody2D.velocity = new Vector2(runSpeed * _directionX, _greenPigRigidbody2D.velocity.y);
+        _movementSpeed = _isHit ? impairedSpeed : runSpeed;
+        
+        _greenPigRigidbody2D.velocity = new Vector2(_movementSpeed * _directionX, _greenPigRigidbody2D.velocity.y);
     }
 
     private void UpdateMovementStatus()
     {
-        if (_isHit)
+        if (_isAlive)
         {
-            _monsterMovementState = MonsterMovementState.Hit;
+            if (_isHit)
+            {
+                _monsterMovementState = MonsterMovementState.Hit;
+            }
+            else
+            {
+                _monsterMovementState = MonsterMovementState.Walking;
+            }
         }
         else
         {
-            _monsterMovementState = MonsterMovementState.Walking;
+            _monsterMovementState = MonsterMovementState.Die;
         }
         
         ChangeAnimatorState();
@@ -85,6 +103,9 @@ public class GreenPigControls : MonoBehaviour
                 break;
             case MonsterMovementState.Hit:
                 _greenPigAnimator.SetInteger(MovementStateHashCode, 1);
+                break;
+            case MonsterMovementState.Die:
+                _greenPigAnimator.SetInteger(MovementStateHashCode, 2);
                 break;
             default:
                 throw new NotImplementedException();
@@ -125,10 +146,19 @@ public class GreenPigControls : MonoBehaviour
         if (health - 1 < 1)
         {
             _gameManager.OnKillPause();
-            Destroy(gameObject);
+            _isAlive = false;
+            _movementSpeed = 0;
+
+            _greenPigBoxCollider2D.enabled = false;
+            _greenPigRigidbody2D.simulated = false;
+
+            var curPos = transform.position;
+            transform.position = new Vector3(curPos.x,curPos.y - 0.1f,0);
+
+            _greenPigSpriteRenderer.sortingLayerName = "Backgrounds";
+            _greenPigSpriteRenderer.sortingOrder = 0;
         }
 
         health--;
-        _greenPigRigidbody2D.velocity = new Vector2(runSpeed / 4, 0);
     }
 }

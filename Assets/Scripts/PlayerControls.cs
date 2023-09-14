@@ -56,9 +56,6 @@ public class PlayerControls : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Reset time scale
-        Time.timeScale = 1f;
-        
         _alive = true;
         _health = 1;
         _directionX = 0f;
@@ -75,8 +72,8 @@ public class PlayerControls : MonoBehaviour
         _gunScript.OnStopFire += FireIsOff;
 
         _stepTriggerScript = stepTrigger.GetComponent<StepTrigger>();
-        _stepTriggerScript.OnStepEnter += ShouldNotTakeDMG;
-        _stepTriggerScript.OnStepExit += ShouldTakeDMG;
+        _stepTriggerScript.OnStepEnter += ShouldNotTakeDmg;
+        _stepTriggerScript.OnStepExit += ShouldTakeDmg;
         // Debug MSG
         // Debug.Log("Player initialization succeed!");
     }
@@ -121,11 +118,7 @@ public class PlayerControls : MonoBehaviour
                 _gunScript.EnableDoubleShot();
             }
         }
-        else
-        {
-            Time.timeScale = 0.2f;
-        }
-        
+
         UpdatePlayerMovementStatus();
     }
 
@@ -266,12 +259,16 @@ public class PlayerControls : MonoBehaviour
 
         _gunScript.FireOff();
 
-        // UpdatePlayerMovementState();
-
-        _gameManager.GetComponent<GameManager>().GameOver();
+        GameManager manager =_gameManager.GetComponent<GameManager>();
+            
+        manager.GameOver();
+        
+        manager.GameOverSloMo();
         
         Destroy(gameObject, 0.5f);
     }
+    
+    
 
     /// <summary>
     /// This will be called by StepTrigger.cs when players step on monsters.
@@ -316,12 +313,12 @@ public class PlayerControls : MonoBehaviour
         _playerIsFiring = false;
     }
 
-    private void ShouldNotTakeDMG()
+    private void ShouldNotTakeDmg()
     {
         _shouldNotHurt = true;
     }
     
-    private void ShouldTakeDMG()
+    private void ShouldTakeDmg()
     {
         _shouldNotHurt = false;
     }

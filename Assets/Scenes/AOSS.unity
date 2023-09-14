@@ -125201,7 +125201,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5627396100080753253, guid: 728a1f848002443af88a19fe1a94ba29, type: 3}
       propertyPath: spawnCoolDown
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5627396100080753255, guid: 728a1f848002443af88a19fe1a94ba29, type: 3}
       propertyPath: m_Name
@@ -125313,7 +125313,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5627396100080753253, guid: 728a1f848002443af88a19fe1a94ba29, type: 3}
       propertyPath: spawnCoolDown
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5627396100080753255, guid: 728a1f848002443af88a19fe1a94ba29, type: 3}
       propertyPath: m_Name

@@ -82,6 +82,11 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(SlowMotionEffect(0.2f, 3f));
     }
+
+    public bool PlayerIsAlive()
+    {
+        return _playerAlive;
+    }
     
     IEnumerator SlowMotionEffect(float slowFactor, float slowMoPeriod)
     {
